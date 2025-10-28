@@ -119,20 +119,28 @@ async def signup(user_data: UserIn):
 
 
 
-@app.post("/api/auth/login", response_model=Token)
+@app.post("/api/auth/login")
 async def login(user_data: UserIn):
     if db is None:
         return PlainTextResponse("Database connection failed.", status_code=500)
 
-    user = await db.users.find_one({"email": user_data.email})
-    
-    if not user or not verify_password(user_data.password, user["hashed_password"]):
-        # ❌ Wrong credentials
+    # ✅ Extra validation for short passwords
+    if len(user_data.password) < 8:
         return PlainTextResponse("Incorrect email or password.", status_code=401)
-        
-    # ✅ Success
+
+    # ✅ Check if user exists
+    user = await db.users.find_one({"email": user_data.email})
+    if not user:
+        return PlainTextResponse("Incorrect email or password.", status_code=401)
+
+    # ✅ Verify password
+    if not verify_password(user_data.password, user["hashed_password"]):
+        return PlainTextResponse("Incorrect email or password.", status_code=401)
+
+    # ✅ Success — send JSON
     token = f"fake_token_for_{user_data.email}"
     return {"access_token": token, "user_email": user_data.email}
+
 
 
 # -------------------- API Keys --------------------
