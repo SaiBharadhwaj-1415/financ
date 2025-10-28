@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import yfinance as yf
@@ -101,20 +102,22 @@ async def signup(user_data: UserIn):
     
     return {"message": "User registered successfully. Please log in."}
 
+
 @app.post("/api/auth/login", response_model=Token)
 async def login(user_data: UserIn):
     if db is None:
-        return {"error": "Database connection failed."}
+        raise HTTPException(status_code=500, detail="Database connection failed.")
 
-    # Use db.users collection instead of user_db
     user = await db.users.find_one({"email": user_data.email})
     
     if not user or not verify_password(user_data.password, user["hashed_password"]):
-        return {"error": "Incorrect email or password."}
+        # ❌ Wrong credentials → raise HTTPException
+        raise HTTPException(status_code=401, detail="Incorrect email or password.")
         
-    # Fake token for demonstration (replace with JWT if needed)
+    # ✅ Success
     token = f"fake_token_for_{user_data.email}"
     return Token(access_token=token, user_email=user_data.email)
+
 
 # -------------------- API Keys --------------------
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyD3Zlhgi_ElXTxzZgmA1EqI9ECroDhmjPM")
