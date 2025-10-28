@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi import HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import yfinance as yf
@@ -85,22 +86,33 @@ class Token(BaseModel):
     token_type: str = "bearer"
     user_email: str
 
+
 @app.post("/api/auth/signup", status_code=201)
 async def signup(user_data: UserIn):
     if db is None:
-        return {"error": "Database connection failed."}
+        return JSONResponse(status_code=500, content={"error": "Database connection failed."})
 
-    # Use db.users collection instead of user_db
+    # ✅ Password length check (extra safety)
+    if len(user_data.password) < 8:
+        return JSONResponse(status_code=400, content={"error": "Password should not be less than 8 characters."})
+
+    # ✅ Confirm password match check
+    if user_data.confirm_password and user_data.password != user_data.confirm_password:
+        return JSONResponse(status_code=400, content={"error": "Passwords do not match."})
+
+    # ✅ Check if user already exists
     user_exists = await db.users.find_one({"email": user_data.email})
     if user_exists:
-        return {"error": "Email already registered."}
+        return JSONResponse(status_code=400, content={"error": "Email already registered."})
 
+    # ✅ Hash and store password
     hashed_password = hash_password(user_data.password)
     new_user = {"email": user_data.email, "hashed_password": hashed_password}
-
     await db.users.insert_one(new_user)
-    
-    return {"message": "User registered successfully. Please log in."}
+
+    # ✅ Success message
+    return JSONResponse(status_code=201, content={"message": "User registered successfully. Please log in."})
+
 
 
 @app.post("/api/auth/login", response_model=Token)
