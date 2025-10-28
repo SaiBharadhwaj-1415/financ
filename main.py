@@ -114,7 +114,7 @@ async def signup(user_data: UserIn):
         print(f"Signup error: {e}")
         return {"error": "Signup failed. Please try again later."}
 
-@app.post("/api/auth/login", response_model=Token)
+@app.post("/api/auth/login")
 async def login(user_data: UserIn):
     """Authenticate a user."""
     if db is None:
