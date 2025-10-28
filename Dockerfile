@@ -28,11 +28,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ==========================================================
 # Install Python Dependencies
 # ==========================================================
-COPY requirements.txt .
+COPY requirements.txt ./
 RUN pip install --upgrade pip setuptools wheel
 
-# Try to install requirements, skip missing ones gracefully
+# Try to install from requirements, skip missing gracefully
 RUN pip install --no-cache-dir -r requirements.txt || true
+
+# Ensure python-multipart exists
+RUN pip install --no-cache-dir python-multipart
 
 # ==========================================================
 # Copy Application Code
@@ -40,18 +43,20 @@ RUN pip install --no-cache-dir -r requirements.txt || true
 COPY . .
 
 # ==========================================================
-# Auto-install any missing dependencies at runtime
+# Auto-install missing deps at runtime
 # ==========================================================
-RUN echo 'import pkg_resources, subprocess, sys\n' \
-         'for dist in pkg_resources.working_set:\n' \
-         '    try:\n' \
-         '        __import__(dist.project_name)\n' \
-         '    except ImportError:\n' \
-         '        print(f"⚠️  Missing {dist.project_name}, installing...")\n' \
-         '        subprocess.check_call([sys.executable, "-m", "pip", "install", dist.project_name])\n' \
-         'print("✅ All dependencies verified!")' \
-         > verify_deps.py && \
-    python verify_deps.py || true
+RUN printf 'import importlib, subprocess, sys\n' \
+           'print("🔍 Checking dependencies...")\n' \
+           'missing=[]\n' \
+           'reqs=subprocess.getoutput("pip freeze").splitlines()\n' \
+           'for name in ["fastapi", "uvicorn", "python-multipart"]:\n' \
+           '    try:\n' \
+           '        importlib.import_module(name)\n' \
+           '    except ImportError:\n' \
+           '        print(f"⚠️ Missing {name}, installing...")\n' \
+           '        subprocess.check_call([sys.executable, "-m", "pip", "install", name])\n' \
+           'print("✅ Dependencies ready!")\n' \
+           > verify_deps.py
 
 # ==========================================================
 # Start Script
@@ -59,7 +64,7 @@ RUN echo 'import pkg_resources, subprocess, sys\n' \
 RUN echo '#!/bin/bash' > /start.sh && \
     echo 'echo "🚀 Starting Financial AI Backend..."' >> /start.sh && \
     echo 'python verify_deps.py || true' >> /start.sh && \
-    echo 'uvicorn main:app --host 0.0.0.0 --port 7860' >> /start.sh && \
+    echo 'exec uvicorn main:app --host 0.0.0.0 --port 7860' >> /start.sh && \
     chmod +x /start.sh
 
 # ==========================================================
