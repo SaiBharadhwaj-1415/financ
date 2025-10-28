@@ -80,8 +80,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 class UserIn(BaseModel):
-    email: str = Field(..., example="test@example.com")
-    password: str = Field(..., min_length=6)
+    email: str
+    password: str
 
 class Token(BaseModel):
     access_token: str
@@ -124,20 +124,14 @@ async def login(user_data: UserIn):
     if db is None:
         return PlainTextResponse("Database connection failed.", status_code=500)
 
-    # ✅ Extra validation for short passwords
+    # ✅ Handle too-short password manually
     if len(user_data.password) < 8:
         return PlainTextResponse("Incorrect email or password.", status_code=401)
 
-    # ✅ Check if user exists
     user = await db.users.find_one({"email": user_data.email})
-    if not user:
+    if not user or not verify_password(user_data.password, user["hashed_password"]):
         return PlainTextResponse("Incorrect email or password.", status_code=401)
 
-    # ✅ Verify password
-    if not verify_password(user_data.password, user["hashed_password"]):
-        return PlainTextResponse("Incorrect email or password.", status_code=401)
-
-    # ✅ Success — send JSON
     token = f"fake_token_for_{user_data.email}"
     return {"access_token": token, "user_email": user_data.email}
 
