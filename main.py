@@ -165,6 +165,65 @@ async def query_ai(prompt: str = Form(...)):
     except Exception as e:
         return {"error": f"AI query failed: {e}"}
 
+# -------------------- Dashboard Endpoint --------------------
+@app.get("/api/dashboard")
+async def get_dashboard_stats():
+    if db is None:
+        return {"error": "Database not available."}
+
+    # 1. Get total counts
+    total_queries = await db.queries.count_documents({})
+    documents_analyzed = await db.uploads.count_documents({})
+
+    # 2. Positive sentiment count
+    positive_sentiments = await db.queries.count_documents({"result": {"$regex": "positive", "$options": "i"}})
+
+    # 3. Trend predictions count
+    trend_predictions = await db.queries.count_documents({"mode": "trend"})
+
+    # 4. Get recent queries and uploads
+    queries_cursor = db.queries.find({}, {"_id": 0}).sort("timestamp", -1).limit(5)
+    recent_queries = await queries_cursor.to_list(length=5)
+
+    uploads_cursor = db.uploads.find({}, {"_id": 0}).sort("timestamp", -1).limit(5)
+    recent_uploads = await uploads_cursor.to_list(length=5)
+
+    all_recent = sorted(
+        recent_queries + recent_uploads,
+        key=lambda x: x.get("timestamp", datetime.min),
+        reverse=True
+    )
+
+    recent = []
+    for item in all_recent[:5]:
+        if "query" in item:
+            status_text = item.get("result", "")
+            recent.append({
+                "type": "Trend" if item.get("mode") == "trend" else "Sentiment",
+                "label": item.get("query", ""),
+                "status": status_text[:40] + "..." if len(status_text) > 40 else status_text,
+                "color": (
+                    "text-yellow-600" if item.get("mode") == "trend" else
+                    "text-green-600" if "positive" in status_text.lower() else
+                    "text-red-600"
+                )
+            })
+        else:
+            recent.append({
+                "type": "Document",
+                "label": item.get("filename", "Unknown File"),
+                "status": "Summarized",
+                "color": "text-indigo-600"
+            })
+
+    return {
+        "totalQueries": total_queries,
+        "positiveSentiment": f"{(positive_sentiments / total_queries * 100):.0f}%" if total_queries > 0 else "0%",
+        "trendPredictions": f"{trend_predictions}/{total_queries}",
+        "documentsAnalyzed": documents_analyzed,
+        "recent": recent
+    }
+
 # -------------------- Health Check --------------------
 @app.get("/")
 async def root():
