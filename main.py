@@ -1,6 +1,8 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import yfinance as yf
@@ -87,23 +89,24 @@ class Token(BaseModel):
     user_email: str
 
 
+
 @app.post("/api/auth/signup", status_code=201)
 async def signup(user_data: UserIn):
     if db is None:
-        return JSONResponse(status_code=500, content={"error": "Database connection failed."})
+        return PlainTextResponse("Database connection failed.", status_code=500)
 
-    # ✅ Password length check (extra safety)
+    # ✅ Password length check
     if len(user_data.password) < 8:
-        return JSONResponse(status_code=400, content={"error": "Password should not be less than 8 characters."})
+        return PlainTextResponse("Password should not be less than 8 characters.", status_code=400)
 
     # ✅ Confirm password match check
     if user_data.confirm_password and user_data.password != user_data.confirm_password:
-        return JSONResponse(status_code=400, content={"error": "Passwords do not match."})
+        return PlainTextResponse("Passwords do not match.", status_code=400)
 
     # ✅ Check if user already exists
     user_exists = await db.users.find_one({"email": user_data.email})
     if user_exists:
-        return JSONResponse(status_code=400, content={"error": "Email already registered."})
+        return PlainTextResponse("Email already registered.", status_code=400)
 
     # ✅ Hash and store password
     hashed_password = hash_password(user_data.password)
@@ -111,24 +114,25 @@ async def signup(user_data: UserIn):
     await db.users.insert_one(new_user)
 
     # ✅ Success message
-    return JSONResponse(status_code=201, content={"message": "User registered successfully. Please log in."})
+    return PlainTextResponse("User registered successfully. Please log in.", status_code=201)
+
 
 
 
 @app.post("/api/auth/login", response_model=Token)
 async def login(user_data: UserIn):
     if db is None:
-        raise HTTPException(status_code=500, detail="Database connection failed.")
+        return PlainTextResponse("Database connection failed.", status_code=500)
 
     user = await db.users.find_one({"email": user_data.email})
     
     if not user or not verify_password(user_data.password, user["hashed_password"]):
-        # ❌ Wrong credentials → raise HTTPException
-        raise HTTPException(status_code=401, detail="Incorrect email or password.")
+        # ❌ Wrong credentials
+        return PlainTextResponse("Incorrect email or password.", status_code=401)
         
     # ✅ Success
     token = f"fake_token_for_{user_data.email}"
-    return Token(access_token=token, user_email=user_data.email)
+    return {"access_token": token, "user_email": user_data.email}
 
 
 # -------------------- API Keys --------------------
