@@ -82,6 +82,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 class UserIn(BaseModel):
     email: str
     password: str
+    confirm_password: Optional[str] = None
+
 
 class Token(BaseModel):
     access_token: str
