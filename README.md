@@ -30,11 +30,11 @@ Database – MongoDB Atlas for storing data and user information
 1. Install Node.js and npm
 2. Open terminal and run:
 
-cd frontend
-npm install
+cd frontend  
+npm install  
 npm start
 
-The frontend runs on:
+The frontend runs on:  
 http://localhost:3000
 
 ---
@@ -47,14 +47,14 @@ http://localhost:3000
 
 Commands:
 
-cd backend
-python -m venv venv
-venv\Scripts\activate   (Windows)
-source venv/bin/activate  (Mac/Linux)
-pip install -r requirements.txt
+cd backend  
+python -m venv venv  
+venv\Scripts\activate   (Windows)  
+source venv/bin/activate  (Mac/Linux)  
+pip install -r requirements.txt  
 uvicorn main:app --reload
 
-Backend runs on:
+Backend runs on:  
 http://127.0.0.1:8000
 
 ---
@@ -79,13 +79,13 @@ MONGO_URI = "your atlas connection url"
 ---
 
 ## How to Run Entire Project
-1. Start backend:
+1. Start backend:  
 uvicorn main:app --reload
 
-2. Start frontend:
+2. Start frontend:  
 npm start
 
-3. Open browser:
+3. Open browser:  
 http://localhost:3000
 
 ---
@@ -96,9 +96,13 @@ Frontend deployed on Vercel
 
 ---
 
+## 📄 Project Report (PDF)
+
+➡️ **[Download Project Report](./FINROBOTAn-OPEN-SOURCE-AI-AGENT-PLATFORM.pdf)**  
+(If GitHub cannot preview, click download to read it.)
+
+---
+
 This project is developed for learning and research purposes.
-
-
-
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
