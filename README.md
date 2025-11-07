@@ -169,5 +169,6 @@ Backend deployed on Hugging Face
 Frontend deployed on Vercel
 ---
 This project is developed for learning and research purposes.
+----
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
