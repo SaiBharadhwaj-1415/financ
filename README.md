@@ -98,7 +98,7 @@ Frontend deployed on Vercel
 
 This project is developed for learning and research purposes.
 ## 📄 Project Report (PDF)
-[Download FinRobot Report](./Finrobot.pdf)
+[Download PDF](./FINROBOTAn-OPEN-SOURCE-AI-AGENT-PLATFORM.pdf)
 
 
 
