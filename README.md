@@ -6,78 +6,70 @@ colorTo: yellow
 sdk: docker
 pinned: false
 ---
+
 # FinRobot – AI Powered Financial Assistant
 
 FinRobot is a full-stack web application that helps users analyze stock market trends, extract summaries from financial documents, and detect sentiment from financial news. The project includes a React frontend, FastAPI backend, MongoDB Atlas database, and an LSTM deep learning model trained on historical stock data.
 
 ## 📄 Project Report (PDF)
-➡️ **[Download Project Report](./FINROBOTAn-OPEN-SOURCE-AI-AGENT-PLATFORM.pdf)**
-*(If GitHub preview fails, click download to open it.)*
+Download here → FINROBOTAn-OPEN-SOURCE-AI-AGENT-PLATFORM.pdf  
+(If GitHub preview fails, click **Download** to open it)
 
-## Technologies Used
-- React JS
-- FastAPI (Python)
-- MongoDB Atlas
-- yFinance
-- LSTM (TensorFlow/Keras)
-- Transformers and NLP models
+## ✅ Technologies Used
+- React JS  
+- FastAPI (Python)  
+- MongoDB Atlas  
+- yFinance  
+- LSTM (TensorFlow/Keras)  
+- Transformers, NLP models  
 - PyMuPDF, Tesseract OCR for document processing
 
-## Project Structure
-- **Frontend:** React UI
-- **Backend:** FastAPI API + ML models
-- **Database:** MongoDB Atlas for storing user data and information
+## ✅ Project Structure
+- Frontend → React UI  
+- Backend → FastAPI + ML models  
+- Database → MongoDB Atlas
 
-## Frontend Setup
-1. Install Node.js and npm
-2. Run:
-    cd frontend
-    npm install
-    npm start
-Frontend runs on:
-http://localhost:3000
+## ✅ Frontend Setup
+Install Node.js and npm  
+Then run:  
+cd frontend  
+npm install  
+npm start  
+Frontend runs on: http://localhost:3000
 
-## Backend Setup
-1. Install Python 3.9+
-2. Create and activate virtual environment
-3. Install packages and run backend
+## ✅ Backend Setup
+Install Python 3.9+  
+Create and activate virtual environment  
+cd backend  
+python -m venv venv  
+venv\Scripts\activate (Windows)  
+source venv/bin/activate (Mac/Linux)  
+pip install -r requirements.txt  
+uvicorn main:app --reload  
+Backend runs on: http://127.0.0.1:8000
 
-Commands:
-    cd backend
-    python -m venv venv
-    venv\Scripts\activate   (Windows)
-    source venv/bin/activate  (Mac/Linux)
-    pip install -r requirements.txt
-    uvicorn main:app --reload
-Backend runs on:
-http://127.0.0.1:8000
+## ✅ MongoDB Setup
+- Create cluster in MongoDB Atlas  
+- Whitelist IP or allow all  
+- Copy connection string  
+- Create .env and add:  
+MONGO_URI="your atlas connection url"
 
-## MongoDB Atlas Setup
-- Create cluster in MongoDB Atlas
-- Whitelist IP or allow 0.0.0.0
-- Copy connection string
-- Create `.env` file in backend:
-    MONGO_URI="your atlas connection url"
+## ✅ Major Features
+✅ Stock trend prediction using LSTM  
+✅ Sentiment analysis of financial news  
+✅ Upload PDF → get summary  
+✅ Interactive UI  
+✅ REST API communication
 
-## Major Features
-✅ Predict stock trends using LSTM  
-✅ Sentiment analysis of financial news and queries  
-✅ Upload PDFs and receive summarized results  
-✅ Interactive React interface  
-✅ REST API communication between frontend and backend
+## ✅ Run Entire Project
+Backend → uvicorn main:app --reload  
+Frontend → npm start  
+Open → http://localhost:3000
 
-## How to Run Entire Project
-1. Start backend:
-    uvicorn main:app --reload
-2. Start frontend:
-    npm start
-3. Open in browser:
-    http://localhost:3000
+## ✅ Deployment
+- Backend → Hugging Face Spaces  
+- Frontend → Vercel
 
-## Deployment
-- Backend deployed on Hugging Face
-- Frontend deployed on Vercel
-
-This project is developed for learning and research purposes.
-Check out the configuration reference:
-https://huggingface.co/docs/hub/spaces-config-reference
+This project is developed for learning and research purposes.  
+Reference: https://huggingface.co/docs/hub/spaces-config-reference
