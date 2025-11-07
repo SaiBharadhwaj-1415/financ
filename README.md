@@ -97,6 +97,9 @@ Frontend deployed on Vercel
 ---
 
 This project is developed for learning and research purposes.
+## 📄 Project Report (PDF)
+[Download FinRobot Report](./Finrobot.pdf)
+
 
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
