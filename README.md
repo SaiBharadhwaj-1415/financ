@@ -169,6 +169,7 @@ Backend deployed on Hugging Face
 Frontend deployed on Vercel
 ---
 This project is developed for learning and research purposes.
+https://financial-ai-frontend-ready-xglz.vercel.app/
 ----
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
